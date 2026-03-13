@@ -833,6 +833,63 @@ CREATE OPERATOR > (
 );
 
 /** @} */
+/** BEGIN Add agg_token comparison to text 
+*/
+
+
+CREATE OR REPLACE FUNCTION agg_token_comp_text(a agg_token, b text)
+RETURNS boolean
+LANGUAGE plpgsql
+IMMUTABLE STRICT PARALLEL SAFE
+AS $$
+BEGIN
+  RAISE EXCEPTION 'Comparison agg_token-text not implemented, should be replaced by ProvSQL behavior';
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION text_comp_agg_token(a text, b agg_token)
+RETURNS boolean
+LANGUAGE plpgsql
+IMMUTABLE STRICT PARALLEL SAFE
+AS $$
+BEGIN
+  RAISE EXCEPTION 'Comparison text-agg_token not implemented, should be replaced by ProvSQL behavior';
+END;
+$$;
+
+
+CREATE OPERATOR = (
+  LEFTARG    = agg_token,
+  RIGHTARG   = text,
+  PROCEDURE  = agg_token_comp_text,
+  COMMUTATOR = =,
+  NEGATOR    = <>
+);
+CREATE OPERATOR = (
+  LEFTARG    = text,
+  RIGHTARG   = agg_token,
+  PROCEDURE  = text_comp_agg_token,
+  COMMUTATOR = =,
+  NEGATOR    = <>
+);
+
+CREATE OPERATOR <> (
+  LEFTARG    = agg_token,
+  RIGHTARG   = text,
+  PROCEDURE  = agg_token_comp_text,
+  COMMUTATOR = <>,
+  NEGATOR    = =
+);
+CREATE OPERATOR <> (
+  LEFTARG    = text,
+  RIGHTARG   = agg_token,
+  PROCEDURE  = text_comp_agg_token,
+  COMMUTATOR = <>,
+  NEGATOR    = =
+);
+
+/** END Add agg_token comparison to text 
+*/
 
 
 CREATE OR REPLACE FUNCTION provenance_aggregate(

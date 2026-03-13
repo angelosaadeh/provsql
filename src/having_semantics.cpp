@@ -90,6 +90,29 @@ static bool semimod_extract_M_and_K(
   return true;
 }
 
+// BEGIN adding comp add_token to text Part 1/5
+
+static bool semimod_extract_string_and_K(
+  GenericCircuit &c,
+  gate_t semimod_gate,
+  std::string &m_out,
+  gate_t &k_gate_out)
+{
+  if (c.getGateType(semimod_gate) != gate_semimod) return false;
+
+  const auto &w = c.getWires(semimod_gate);
+  if (w.size() != 2) return false;
+
+  if (c.getGateType(w[1]) != gate_value) return false;
+  m_out = c.getExtra(w[1]); 
+
+  k_gate_out = w[0];
+  return true;
+}
+
+// END adding comp add_token to text Part 1/5
+
+
 // Extract constant C from possible encodings:
 // - gate_value("C")
 // - gate_semimod(C, gate_one)
@@ -117,6 +140,30 @@ static bool extract_constant_C(GenericCircuit &c, gate_t x, int &C_out) {
   C_out = v;
   return true;
 }
+
+// BEGIN adding comp add_token to text Part 2/5
+
+static bool extract_constant_string(GenericCircuit &c, gate_t x, std::string &C_out) {
+
+  if (c.getGateType(x) != gate_semimod)
+    return false;
+
+  const auto &w = c.getWires(x);
+  if (w.size() != 2)
+    return false;
+
+  if (c.getGateType(w[0]) != gate_one)
+    return false;
+
+  if (c.getGateType(w[1]) != gate_value)
+    return false;
+
+  C_out = c.getExtra(w[1]);
+  return true;
+}
+
+// END adding comp add_token to text Part 2/5
+
 //collect cmp gates in the prov circuit
 static void collect_sp_cmp_gates(GenericCircuit &c, gate_t start, std::vector<gate_t> &out) {
   std::vector<gate_t> stack;
@@ -135,12 +182,20 @@ static void collect_sp_cmp_gates(GenericCircuit &c, gate_t start, std::vector<ga
       if (cw.size() == 2) {
         gate_t L = cw[0];
         gate_t R = cw[1];
-
+        // BEGIN adding comp add_token to text Part 3/5
+        // OLD CODE
+        // int tmpC = 0;
+        // bool is_candidate =
+        //   (c.getGateType(L) == gate_agg && extract_constant_C(c, R, tmpC)) ||
+        //   (c.getGateType(R) == gate_agg && extract_constant_C(c, L, tmpC));
         int tmpC = 0;
+        std::string tmpC_str;
         bool is_candidate =
           (c.getGateType(L) == gate_agg && extract_constant_C(c, R, tmpC)) ||
-          (c.getGateType(R) == gate_agg && extract_constant_C(c, L, tmpC));
-
+          (c.getGateType(R) == gate_agg && extract_constant_C(c, L, tmpC)) ||
+          (c.getGateType(L) == gate_agg && extract_constant_string(c, R, tmpC_str)) ||
+          (c.getGateType(R) == gate_agg && extract_constant_string(c, L, tmpC_str));
+          // END adding comp add_token to text Part 3/5 
         if (is_candidate)
           out.push_back(cur);
       }
@@ -184,8 +239,20 @@ static void try_having_impl(
                             if (!okop) return false;
 
                             auto build_from = [&](gate_t agg_side, gate_t const_side, ComparisonOperator effective_op) -> bool {
+                                                // BEGIN adding comp agg_token to text part 4/5
+                                                // OLD CODE:
+                                                // int C = 0;
+                                                // if (!extract_constant_C(c, const_side, C)) return false;
+
                                                 int C = 0;
-                                                if (!extract_constant_C(c, const_side, C)) return false;
+                                                std::string C_str;
+                                                bool is_string = false;
+
+                                                if (!extract_constant_C(c, const_side, C)) {
+                                                  if (!extract_constant_string(c, const_side, C_str)) return false;
+                                                  is_string = true;
+                                                }
+                                                // END adding comp agg_token to text part 4/5
 
                                                 if (c.getGateType(agg_side) != gate_agg) return false;
 
@@ -197,18 +264,62 @@ static void try_having_impl(
                                                 std::vector<typename SemiringT::value_type> kvals;
                                                 kvals.reserve(children.size());
 
+                                                // BEGIN adding comp agg_token to text part 5/5
+                                                // OLD CODE:
+                                                // for (gate_t ch : children) {
+                                                //   if (c.getGateType(ch) != gate_semimod) return false;
+
+                                                //   int m = 0;
+                                                //   gate_t k_gate{};
+                                                //   if (!semimod_extract_M_and_K(c, ch, m, k_gate)) return false;
+
+                                                //   auto kval = c.evaluate<SemiringT>(k_gate, mapping, S);
+
+                                                //   mvals.push_back(m);
+                                                //   kvals.push_back(std::move(kval));
+                                                // }
+
+                                                std::vector<std::string> mvals_str;
+                                                mvals_str.reserve(children.size());
+
                                                 for (gate_t ch : children) {
                                                   if (c.getGateType(ch) != gate_semimod) return false;
 
-                                                  int m = 0;
                                                   gate_t k_gate{};
-                                                  if (!semimod_extract_M_and_K(c, ch, m, k_gate)) return false;
+
+                                                  if (is_string) {
+                                                    std::string m_str;
+                                                    if (!semimod_extract_string_and_K(c, ch, m_str, k_gate)) return false;
+                                                    mvals_str.push_back(m_str);
+                                                  } else {
+                                                    int m = 0;
+                                                    if (!semimod_extract_M_and_K(c, ch, m, k_gate)) return false;
+                                                    mvals.push_back(m);
+                                                  }
 
                                                   auto kval = c.evaluate<SemiringT>(k_gate, mapping, S);
 
-                                                  mvals.push_back(m);
                                                   kvals.push_back(std::move(kval));
                                                 }
+                                                
+                                                // The following part needs to be fixed because it doesnt evaluate all possible worlds
+                                                if (is_string) {
+                                                  if (op != ComparisonOperator::EQ && op != ComparisonOperator::NE)
+                                                    return false;
+
+                                                  std::vector<typename SemiringT::value_type> matching;
+                                                  for (size_t i = 0; i < mvals_str.size(); i++) {
+                                                    bool matches = (op == ComparisonOperator::EQ) ?
+                                                                  (mvals_str[i] == C_str) :
+                                                                  (mvals_str[i] != C_str);
+                                                    if (matches)
+                                                      matching.push_back(kvals[i]);
+                                                  }
+
+                                                  pw_out = S.plus(matching);
+                                                  return true;
+                                                }
+                                                // END adding comp agg_token to text part 5/5
 
                                                 AggregationOperator agg_kind = getAggregationOperator(c.getInfos(agg_side).first);
 
