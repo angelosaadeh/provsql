@@ -313,8 +313,12 @@ static void try_having_impl(
                                                     if (matches)
                                                       matching.push_back(kvals[i]);
                                                   }
-
-                                                  pw_out = S.plus(matching);
+                                                  
+                                                  if (matching.empty()) {
+                                                      pw_out = S.zero();
+                                                  } else {
+                                                      pw_out = S.plus(matching);
+                                                  }
                                                   return true;
                                                 }
                                                 // END adding comp agg_token to text part 5/5
