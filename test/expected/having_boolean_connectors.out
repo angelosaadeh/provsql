@@ -1,0 +1,63 @@
+\set ECHO none
+remove_provenance
+
+(1 row)
+city|prob
+Berlin|0.82
+New York|0.28
+Paris|0.77
+(3 rows)
+remove_provenance
+
+(1 row)
+city|prob
+Berlin|0.82
+New York|0.28
+Paris|0.77
+(3 rows)
+remove_provenance
+
+(1 row)
+city|c|formula|counting|round
+Berlin|2 (*)|((Susan ⊗ (𝟙 ⊖ Ellen)) ⊕ (Ellen ⊗ (𝟙 ⊖ Susan)))|0|0.54
+New York|2 (*)|((Paul ⊗ (𝟙 ⊖ John)) ⊕ (John ⊗ (𝟙 ⊖ Paul)))|0|0.26
+Paris|3 (*)|((Dave ⊗ Magdalen ⊗ Nancy) ⊕ ((Nancy ⊗ (𝟙 ⊖ (Dave ⊕ Magdalen))) ⊕ (Magdalen ⊗ (𝟙 ⊖ (Dave ⊕ Nancy))) ⊕ (Dave ⊗ (𝟙 ⊖ (Magdalen ⊕ Nancy)))))|1|0.50
+(3 rows)
+remove_provenance
+
+(1 row)
+city|c|formula|counting|round
+Berlin|2 (*)|((Susan ⊗ (𝟙 ⊖ Ellen)) ⊕ (Ellen ⊗ (𝟙 ⊖ Susan)))|0|0.54
+New York|2 (*)|((Paul ⊗ (𝟙 ⊖ John)) ⊕ (John ⊗ (𝟙 ⊖ Paul)))|0|0.26
+Paris|3 (*)|((Dave ⊗ Magdalen ⊗ Nancy) ⊕ ((Nancy ⊗ (𝟙 ⊖ (Dave ⊕ Magdalen))) ⊕ (Magdalen ⊗ (𝟙 ⊖ (Dave ⊕ Nancy))) ⊕ (Dave ⊗ (𝟙 ⊖ (Magdalen ⊕ Nancy)))))|1|0.50
+(3 rows)
+remove_provenance
+
+(1 row)
+city|c|formula|counting|round
+Berlin|2 (*)|((Susan ⊗ (𝟙 ⊖ Ellen)) ⊕ (Ellen ⊗ (𝟙 ⊖ Susan)))|0|0.54
+New York|2 (*)|((Paul ⊗ (𝟙 ⊖ John)) ⊕ (John ⊗ (𝟙 ⊖ Paul)))|0|0.26
+Paris|3 (*)|((Dave ⊗ Magdalen ⊗ Nancy) ⊕ ((Nancy ⊗ (𝟙 ⊖ (Dave ⊕ Magdalen))) ⊕ (Magdalen ⊗ (𝟙 ⊖ (Dave ⊕ Nancy))) ⊕ (Dave ⊗ (𝟙 ⊖ (Magdalen ⊕ Nancy)))))|1|0.50
+(3 rows)
+remove_provenance
+
+(1 row)
+city|c|s|round
+Berlin|2 (*)|11 (*)|0.28
+New York|2 (*)|3 (*)|0.00
+Paris|3 (*)|14 (*)|0.36
+(3 rows)
+remove_provenance
+
+(1 row)
+city|c|s|round
+Berlin|2 (*)|11 (*)|0.28
+New York|2 (*)|3 (*)|0.00
+Paris|3 (*)|14 (*)|0.36
+(3 rows)
+remove_provenance
+
+(1 row)
+city|c|formula|counting|round
+Paris|3 (*)|((Dave ⊗ Magdalen ⊗ Nancy) ⊕ ((Nancy ⊗ (𝟙 ⊖ (Dave ⊕ Magdalen))) ⊕ (Magdalen ⊗ (𝟙 ⊖ (Dave ⊕ Nancy))) ⊕ (Dave ⊗ (𝟙 ⊖ (Magdalen ⊕ Nancy)))))|1|0.50
+(1 row)
