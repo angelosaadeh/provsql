@@ -304,8 +304,6 @@ static void try_having_impl(
                                                 
                                                 // The following part needs to be fixed because it doesnt evaluate all possible worlds
                                                 if (is_string) {
-                                                  if (op != ComparisonOperator::EQ && op != ComparisonOperator::NE)
-                                                    return false;
 
                                                   std::vector<typename SemiringT::value_type> matching;
                                                   for (size_t i = 0; i < mvals_str.size(); i++) {
